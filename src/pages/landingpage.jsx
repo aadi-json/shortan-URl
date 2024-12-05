@@ -10,12 +10,14 @@ import {
 import { useNavigate } from "react-router-dom";
 
 const LandingPage = () => {
-  const [inputVal, setInputVal] = useState();
+  const [inputVal, setInputVal] = useState("");
   const navigate = useNavigate();
 
   const handleInput = (e) => {
     e.preventDefault();
-    if (inputVal) return navigate(`/auth/createnew${inputVal}`);
+    if (inputVal) {
+      return navigate(`/auth?createNew=${inputVal}`);
+    }
   };
 
   return (
@@ -29,6 +31,7 @@ const LandingPage = () => {
           onSubmit={handleInput}
         >
           <Input
+            type="url"
             placeholder="Enter your URL...."
             className="h-full flex-1 my-4 mx-4 sm:my-6 sm:mx-6 lg:my-6 lg:mx-8"
             value={inputVal}
@@ -41,7 +44,7 @@ const LandingPage = () => {
 
         <div className="flex justify-center mb-10">
           <img
-            src="/banner.jpeg"
+            src="/banner.jpeg" // Ensure this path is correct
             alt="URL shortener banner"
             className="w-full max-w-3xl mx-4 sm:mx-6 lg:mx-8"
           />

@@ -22,12 +22,13 @@ const router = createBrowserRouter([
         path: "/auth",
         element: <Auth />,
       },
+
       {
-        path: "/link:id",
+        path: "/link/:id",
         element: <Link />,
       },
       {
-        path: "/redirect-link",
+        path: "/:id",
         element: <Redirect />,
       },
     ],
