@@ -9,11 +9,14 @@ import {
 } from "./ui/card";
 import { Button } from "./ui/button";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import * as Yup from "yup";
 import Error from "./error";
 
 import { BeatLoader } from "react-spinners";
+import useFetch from "@/hook/usefectch-hook";
+import { login } from "@/db/apiAuth";
+import { Navigate } from "react-router-dom";
 const Login = () => {
   const [error, setError] = useState({});
   const [formData, setFormData] = useState({
@@ -29,6 +32,12 @@ const Login = () => {
     }));
   };
 
+  const { data, errors, fn: fnLogin, loading } = useFetch(formData, login);
+
+  useEffect(() => {
+    console.log(data);
+  }, [data, errors]);
+
   const handleLogin = async () => {
     setError([]);
     try {
@@ -42,6 +51,7 @@ const Login = () => {
       });
 
       await schema.validate(formData, { abortEarly: false });
+      await fnLogin();
     } catch (e) {
       const newErrors = {};
 
@@ -60,6 +70,7 @@ const Login = () => {
         <CardDescription>
           to your account if you already have one
         </CardDescription>
+        {errors && <Error messege={error.message} />}
       </CardHeader>
       <CardContent className="space-y-2">
         <div className="space-y-1">
@@ -84,7 +95,7 @@ const Login = () => {
       </CardContent>
       <CardFooter>
         <Button onClick={handleLogin}>
-          {true ? <BeatLoader size={10} color="#36d7b7" /> : "Login"}
+          {loading ? <BeatLoader size={10} color="#36d7b7" /> : "Login"}
         </Button>
       </CardFooter>
     </Card>
