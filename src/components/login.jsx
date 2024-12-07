@@ -8,17 +8,22 @@ import {
   CardTitle,
 } from "./ui/card";
 import { Button } from "./ui/button";
-
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import * as Yup from "yup";
 import Error from "./error";
-
-import { BeatLoader } from "react-spinners";
-import useFetch from "@/hook/usefectch-hook";
 import { login } from "@/db/apiAuth";
-import { Navigate } from "react-router-dom";
+import { BeatLoader } from "react-spinners";
+import useFetch from "../hook/usefectch-hook";
+import { UrlState } from "@/context";
+
 const Login = () => {
-  const [error, setError] = useState({});
+  let [searchParams] = useSearchParams();
+  const longLink = searchParams.get("createNew");
+
+  const navigate = useNavigate();
+
+  const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -32,14 +37,19 @@ const Login = () => {
     }));
   };
 
-  const { data, errors, fn: fnLogin, loading } = useFetch(formData, login);
+  const { loading, error, fn: fnLogin, data } = useFetch(login, formData);
+  const { fetchUser } = UrlState();
 
   useEffect(() => {
-    console.log(data);
-  }, [data, errors]);
+    if (error === null && data) {
+      fetchUser();
+      navigate(`/dashboard?${longLink ? `createNew=${longLink}` : ""}`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [error, data]);
 
   const handleLogin = async () => {
-    setError([]);
+    setErrors([]);
     try {
       const schema = Yup.object().shape({
         email: Yup.string()
@@ -59,7 +69,7 @@ const Login = () => {
         newErrors[err.path] = err.message;
       });
 
-      setError(newErrors);
+      setErrors(newErrors);
     }
   };
 
@@ -70,7 +80,7 @@ const Login = () => {
         <CardDescription>
           to your account if you already have one
         </CardDescription>
-        {errors && <Error messege={error.message} />}
+        {error && <Error message={error.message} />}
       </CardHeader>
       <CardContent className="space-y-2">
         <div className="space-y-1">
@@ -80,9 +90,8 @@ const Login = () => {
             placeholder="Enter Email"
             onChange={handleInputChange}
           />
-          {error.email && <Error messege={error.email} />}
         </div>
-
+        {errors.email && <Error message={errors.email} />}
         <div className="space-y-1">
           <Input
             name="password"
@@ -90,8 +99,8 @@ const Login = () => {
             placeholder="Enter Password"
             onChange={handleInputChange}
           />
-          {error.password && <Error messege={error.password} />}
         </div>
+        {errors.password && <Error message={errors.password} />}
       </CardContent>
       <CardFooter>
         <Button onClick={handleLogin}>

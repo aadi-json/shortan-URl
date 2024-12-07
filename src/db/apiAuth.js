@@ -1,7 +1,4 @@
-import { data } from "react-router-dom";
 import { supabase } from "./supabase";
-import { DatabaseZapIcon } from "lucide-react";
-
 export async function login({ email, password }) {
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
@@ -13,4 +10,12 @@ export async function login({ email, password }) {
   } else {
     return data;
   }
+}
+
+export async function getCurrentUser() {
+  const { data: session, error } = await supabase.auth.getSession();
+  if (!session.session) return null;
+  if (error) throw new Error(error.message);
+
+  return session.session?.user;
 }
