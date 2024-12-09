@@ -45,11 +45,10 @@ const Login = () => {
       fetchUser();
       navigate(`/dashboard?${longLink ? `createNew=${longLink}` : ""}`);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [error, data]);
 
   const handleLogin = async () => {
-    setErrors([]);
+    setErrors([]); // Reset errors before validating
     try {
       const schema = Yup.object().shape({
         email: Yup.string()
@@ -60,16 +59,19 @@ const Login = () => {
           .required("Password is required"),
       });
 
+      // Validate form data
       await schema.validate(formData, { abortEarly: false });
-      await fnLogin();
+
+      await fnLogin(); // Assuming fnLogin is your login function
     } catch (e) {
       const newErrors = {};
 
+      // Loop through the errors returned by Yup
       e?.inner?.forEach((err) => {
         newErrors[err.path] = err.message;
       });
 
-      setErrors(newErrors);
+      setErrors(newErrors); // Set the errors state
     }
   };
 
@@ -80,7 +82,7 @@ const Login = () => {
         <CardDescription>
           to your account if you already have one
         </CardDescription>
-        {error && <Error message={error.message} />}
+        {error && <Error message={errors.message} />}
       </CardHeader>
       <CardContent className="space-y-2">
         <div className="space-y-1">
